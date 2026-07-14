@@ -51,6 +51,37 @@
     color:#CFC7B4;
   }
 
+  .trip-meta{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:14px 18px;
+    background:#EFE8D6;
+    border-bottom:1px solid var(--line);
+  }
+  .meta-chip{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    text-decoration:none;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:9px 12px;
+  }
+  .meta-icon{font-size:16px;line-height:1.4;}
+  .meta-text{
+    font-size:12.5px;
+    line-height:1.55;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .meta-sub{
+    font-family:'Noto Sans TC',sans-serif;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+
   nav.day-tabs{
     display:flex;
     gap:10px;
@@ -378,8 +409,19 @@
   <header class="topbar">
     <span class="eyebrow">SEOUL · 서울 TRIP PLAN</span>
     <h1>首爾夏日行程</h1>
-    <span class="dates">2026.07.20 MON — 07.23 THU</span>
+    <span class="dates">2026.07.20 MON — 07.25 SAT</span>
   </header>
+
+  <div class="trip-meta">
+    <a class="meta-chip" href="https://map.naver.com/p/search/인천국제공항" target="_blank" rel="noopener">
+      <span class="meta-icon">✈️</span>
+      <span class="meta-text">TPE→ICN 7/20 15:15-18:45 ｜ ICN→TPE 7/25 19:45-21:25<br><span class="meta-sub">長榮航空 EVA Air · 直飛</span></span>
+    </a>
+    <a class="meta-chip" href="https://map.naver.com/p/search/서울 마포구 서강로11길 21" target="_blank" rel="noopener">
+      <span class="meta-icon">🏨</span>
+      <span class="meta-text">全程住宿：21 Seogang-ro 11-gil, Seoul 04061<br><span class="meta-sub">近西江大／新村一帶 · 點擊開地圖</span></span>
+    </a>
+  </div>
 
   <nav class="day-tabs" id="dayTabs">
     <button class="day-tab active" data-day="1" style="--accent:#2A6F77">
@@ -394,10 +436,17 @@
     <button class="day-tab" data-day="4" style="--accent:#A6822E">
       <span class="dot"></span><span class="day-label">DAY 4</span><span class="day-date">7/23 四</span>
     </button>
-    <button class="day-tab" data-day="5" style="--accent:#B23A48">
+    <button class="day-tab" data-day="5" style="--accent:#8A8574">
+      <span class="dot"></span><span class="day-label">DAY 5</span><span class="day-date">7/24 五</span>
+    </button>
+    <button class="day-tab" data-day="6" style="--accent:#2E4A6B">
+      <span class="dot"></span><span class="day-label">DAY 6</span><span class="day-date">7/25 六</span>
+    </button>
+    <button class="day-tab" data-day="7" style="--accent:#B23A48">
       <span class="dot"></span><span class="day-label">🍽 餐廳</span><span class="day-date">依區域</span>
     </button>
   </nav>
+
 
   <main>
 
@@ -407,6 +456,8 @@
         <span class="stub">DAY 1 / 7.20 MON</span>
         <h2>弘大採買．望遠漢江夜色</h2>
         <div class="route">
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/인천국제공항" target="_blank" rel="noopener">仁川<br>機場</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/서울 마포구 서강로11길 21" target="_blank" rel="noopener">飯店<br>放行李</a></span></div>
           <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/홈플러스 합정점" target="_blank" rel="noopener">合井<br>Homeplus</a></span></div>
           <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/홍대입구역" target="_blank" rel="noopener">弘大<br>逛街晚餐</a></span></div>
           <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/망원한강공원" target="_blank" rel="noopener">望遠<br>漢江公園</a></span></div>
@@ -414,17 +465,33 @@
       </div>
 
       <div class="stats-row" style="--accent:#2A6F77">
-        <div class="stat"><span class="num">3</span><span class="label">景點</span></div>
+        <div class="stat"><span class="num">5</span><span class="label">景點</span></div>
         <div class="stat"><span class="num">5</span><span class="label">美食選項</span></div>
-        <div class="stat"><span class="num">2</span><span class="label">移動</span></div>
+        <div class="stat"><span class="num">4</span><span class="label">移動</span></div>
       </div>
 
       <div class="tip-box" style="--accent:#2A6F77">
         <span class="tip-title">今日提醒</span>
-        <p>合井站 Homeplus 直通地鐵最方便補給。體力允許的話晚上推薦去<b>望遠漢江公園</b>——比熱門的汝矣島更少觀光客，買炸雞吹河風，看楊花大橋夜景很愜意。</p>
+        <p><b>長榮 BR167</b> 15:15 桃園起飛，18:45 抵達仁川機場（直飛）。建議入境後先搭 AREX／機場巴士到住宿放行李，再輕裝出門。合井站 Homeplus 直通地鐵最方便補給。體力允許的話晚上推薦去<b>望遠漢江公園</b>——比熱門的汝矣島更少觀光客，買炸雞吹河風，看楊花大橋夜景很愜意。</p>
       </div>
 
       <div class="timeline" style="--accent:#2A6F77">
+        <div class="t-item">
+          <div class="t-icon">🛬</div>
+          <div class="t-body">
+            <span class="t-time">15:15-18:45</span>
+            <p class="t-title">TPE → ICN．長榮航空直飛 <a class="pin" href="https://map.naver.com/p/search/인천국제공항" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">桃園 15:15 起飛，18:45 抵達仁川機場，經濟艙基本 Basic(V)。</p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🏨</div>
+          <div class="t-body">
+            <span class="t-time">傍晚前</span>
+            <p class="t-title">飯店 Check-in．放行李 <a class="pin" href="https://map.naver.com/p/search/서울 마포구 서강로11길 21" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">21 Seogang-ro 11-gil, Seoul 04061（近西江大／新村一帶），全程 5 晚都住這裡。</p>
+          </div>
+        </div>
         <div class="t-item">
           <div class="t-icon">🛒</div>
           <div class="t-body">
@@ -701,8 +768,73 @@
       </div>
     </section>
 
-    <!-- DAY 5 - 餐廳地圖 -->
+    <!-- DAY 5 -->
     <section class="day-panel" data-panel="5">
+      <div class="hero" style="--accent:#8A8574">
+        <span class="stub">DAY 5 / 7.24 FRI</span>
+        <h2>行程規劃中．待補</h2>
+        <p class="hero-sub">這天還沒排，之後補上細節就會出現在這裡。</p>
+      </div>
+
+      <div class="tip-box" style="--accent:#8A8574">
+        <span class="tip-title">提醒</span>
+        <p>住宿仍是 <b>21 Seogang-ro 11-gil, Seoul 04061</b>，這天不用換飯店。想到要去哪裡再跟我說，我幫你排進時間軸。</p>
+      </div>
+    </section>
+
+    <!-- DAY 6 -->
+    <section class="day-panel" data-panel="6">
+      <div class="hero" style="--accent:#2E4A6B">
+        <span class="stub">DAY 6 / 7.25 SAT · 離境日</span>
+        <h2>退房．前往仁川機場</h2>
+        <div class="route">
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/서울 마포구 서강로11길 21" target="_blank" rel="noopener">飯店<br>退房</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/공덕역" target="_blank" rel="noopener">공덕역<br>AREX</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/인천국제공항" target="_blank" rel="noopener">仁川<br>機場</a></span></div>
+        </div>
+      </div>
+
+      <div class="stats-row" style="--accent:#2E4A6B">
+        <div class="stat"><span class="num">19:45</span><span class="label">起飛時間</span></div>
+        <div class="stat"><span class="num">21:25</span><span class="label">抵達TPE</span></div>
+        <div class="stat"><span class="num">3</span><span class="label">建議提前</span></div>
+      </div>
+
+      <div class="tip-box" style="--accent:#2E4A6B">
+        <span class="tip-title">今日提醒</span>
+        <p><b>長榮 BR166</b> 19:45 仁川起飛，21:25 抵達桃園（直飛）。國際線建議提前 3 小時抵達機場，回推<b>約 16:00–16:30 前要離開飯店</b>。從西江路住宿最近的 AREX（機場快線）站是<b>공덕역</b>，步行或短程計程車可達，搭直達車到仁川機場約 45–50 分鐘；若行李多或人數少，直接叫計程車到機場也是選項（車程約 50–60 分鐘，視路況）。退房前記得再次確認護照、退稅單據都收好。</p>
+      </div>
+
+      <div class="timeline" style="--accent:#2E4A6B">
+        <div class="t-item">
+          <div class="t-icon">🧳</div>
+          <div class="t-body">
+            <span class="t-time">上午</span>
+            <p class="t-title">飯店退房．整理行李 <a class="pin" href="https://map.naver.com/p/search/서울 마포구 서강로11길 21" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">若還想留半天逛街，可先寄放行李在飯店櫃檯，退房不用馬上帶著行李移動。</p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🚆</div>
+          <div class="t-body">
+            <span class="t-time">約 16:00 前</span>
+            <p class="t-title">前往공덕역 搭 AREX 到仁川機場 <a class="pin" href="https://map.naver.com/p/search/공덕역" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">直達車約 45–50 分鐘；一般車停靠站較多，時間略長，出發前可再查即時班次。</p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🛫</div>
+          <div class="t-body">
+            <span class="t-time">19:45-21:25</span>
+            <p class="t-title">ICN → TPE．長榮航空直飛 <a class="pin" href="https://map.naver.com/p/search/인천국제공항" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">仁川 19:45 起飛，21:25 抵達桃園，經濟艙基本 Basic(W)。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAY 7 - 餐廳地圖 -->
+    <section class="day-panel" data-panel="7">
       <div class="hero" style="--accent:#B23A48">
         <span class="stub">🍽 餐廳地圖 / 全行程總覽</span>
         <h2>美食地圖．依區域整理</h2>
