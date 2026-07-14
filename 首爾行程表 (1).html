@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>首爾行程表 · 7/20-7/23</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F1E6;
+    --paper-soft:#ECE4D3;
+    --ink:#1F2421;
+    --ink-soft:#5B5A52;
+    --line:#D8CFB8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans TC','PingFang TC',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:720px;margin:0 auto;min-height:100vh;background:var(--paper);position:relative;}
+
+  header.topbar{
+    background:var(--ink);
+    color:var(--paper);
+    padding:26px 22px 22px;
+    position:relative;
+  }
+  header.topbar .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    color:#B9C4BC;
+    display:block;
+    margin-bottom:8px;
+  }
+  header.topbar h1{
+    font-family:'Noto Serif TC',serif;
+    font-weight:900;
+    font-size:26px;
+    margin:0 0 6px;
+    letter-spacing:.02em;
+  }
+  header.topbar .dates{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    color:#CFC7B4;
+  }
+
+  nav.day-tabs{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding:16px 16px 14px;
+    background:var(--paper-soft);
+    border-bottom:1px dashed var(--line);
+    scrollbar-width:none;
+  }
+  nav.day-tabs::-webkit-scrollbar{display:none;}
+  .day-tab{
+    flex:0 0 auto;
+    width:96px;
+    background:var(--paper);
+    border:1.5px solid var(--line);
+    border-radius:10px;
+    padding:10px 8px 9px;
+    text-align:left;
+    cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--ink-soft);
+    position:relative;
+    transition:all .18s ease;
+  }
+  .day-tab .dot{
+    display:inline-block;
+    width:8px;height:8px;border-radius:50%;
+    background:var(--accent);
+    margin-bottom:6px;
+  }
+  .day-tab .day-label{display:block;font-size:13px;font-weight:600;color:var(--ink);}
+  .day-tab .day-date{display:block;font-size:11px;margin-top:2px;}
+  .day-tab.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .day-tab.active .day-label{color:#fff;}
+  .day-tab.active .dot{background:#fff;}
+
+  main{padding:0 0 60px;}
+  .day-panel{display:none;}
+  .day-panel.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .hero{
+    background:var(--accent);
+    color:#fff;
+    margin:18px 18px 0;
+    border-radius:16px;
+    padding:22px 22px 20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:'';
+    position:absolute;
+    right:-40px;top:-40px;
+    width:140px;height:140px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+  }
+  .hero .stub{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.14em;
+    opacity:.85;
+    margin-bottom:10px;
+  }
+  .hero h2{
+    font-family:'Noto Serif TC',serif;
+    font-weight:900;
+    font-size:23px;
+    line-height:1.4;
+    margin:0 0 18px;
+    position:relative;
+    z-index:1;
+  }
+  .hero p.hero-sub{
+    font-size:13px;
+    line-height:1.7;
+    opacity:.92;
+    margin:0;
+    position:relative;
+    z-index:1;
+  }
+
+  .route{
+    display:flex;
+    overflow-x:auto;
+    gap:0;
+    padding:14px 2px 4px;
+    scrollbar-width:none;
+  }
+  .route::-webkit-scrollbar{display:none;}
+  .stop{
+    flex:0 0 auto;
+    min-width:88px;
+    max-width:110px;
+    text-align:center;
+    position:relative;
+    padding-top:20px;
+  }
+  .stop::before{
+    content:'';
+    position:absolute;
+    top:5px; left:-50%;
+    width:100%; height:2px;
+    background-image:linear-gradient(to right, rgba(255,255,255,.65) 60%, transparent 40%);
+    background-size:8px 2px;
+    background-repeat:repeat-x;
+  }
+  .stop:first-child::before{display:none;}
+  .stop .node{
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:11px;height:11px;border-radius:50%;
+    background:#fff;
+    box-shadow:0 0 0 2px rgba(255,255,255,.35);
+  }
+  .stop .stop-name{
+    font-size:11.5px;
+    line-height:1.35;
+    display:block;
+    opacity:.95;
+    font-weight:500;
+  }
+  .stop .stop-name a{
+    color:#fff;
+    text-decoration:none;
+    border-bottom:1px dotted rgba(255,255,255,.6);
+  }
+
+  .stats-row{
+    display:flex;
+    gap:10px;
+    margin:14px 18px 0;
+  }
+  .stat{
+    flex:1;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 4px;
+    text-align:center;
+  }
+  .stat .num{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:19px;
+    color:var(--accent);
+    display:block;
+  }
+  .stat .label{
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:2px;
+    display:block;
+  }
+
+  .tip-box{
+    margin:16px 18px 0;
+    background:var(--paper-soft);
+    border-left:3px solid var(--accent);
+    border-radius:4px 10px 10px 4px;
+    padding:14px 16px;
+  }
+  .tip-box .tip-title{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:.06em;
+    color:var(--accent);
+    display:block;
+    margin-bottom:6px;
+  }
+  .tip-box p{
+    margin:0;
+    font-size:13.5px;
+    line-height:1.75;
+    color:var(--ink);
+  }
+
+  .timeline{
+    margin:20px 18px 0;
+    display:flex;
+    flex-direction:column;
+    gap:0;
+  }
+  .t-item{
+    display:flex;
+    gap:14px;
+    padding:14px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .t-item:last-child{border-bottom:none;}
+  .t-icon{
+    flex:0 0 auto;
+    width:38px;height:38px;
+    border-radius:10px;
+    background:var(--paper-soft);
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+  }
+  .t-body{flex:1;min-width:0;}
+  .t-time{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--accent);
+    font-weight:600;
+    letter-spacing:.04em;
+    display:block;
+    margin-bottom:3px;
+  }
+  .t-title{
+    font-weight:700;
+    font-size:14.5px;
+    margin:0 0 4px;
+    color:var(--ink);
+  }
+  .t-title .pin{
+    font-size:11px;
+    margin-left:6px;
+    text-decoration:none;
+    opacity:.55;
+    border-bottom:1px dotted var(--ink-soft);
+  }
+  .t-title .pin:hover{opacity:1;color:var(--accent);border-color:var(--accent);}
+  .t-note{
+    font-size:12.8px;
+    color:var(--ink-soft);
+    line-height:1.65;
+    margin:0;
+  }
+  .t-note b{color:var(--ink);font-weight:600;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  a.chip, span.chip{
+    font-size:11.5px;
+    padding:4px 10px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:100px;
+    color:var(--ink);
+    text-decoration:none;
+    display:inline-block;
+  }
+  a.chip:hover{border-color:var(--accent);color:var(--accent);}
+  .chip.alt{border-style:dashed;color:var(--ink-soft);}
+
+  .section-label{
+    margin:24px 18px 10px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    color:var(--ink-soft);
+    display:flex;align-items:center;gap:8px;
+  }
+  .section-label::after{
+    content:'';flex:1;height:1px;background:var(--line);
+  }
+
+  footer.note{
+    margin:30px 18px 0;
+    padding:14px 16px;
+    border:1px dashed var(--line);
+    border-radius:10px;
+    font-size:12px;
+    color:var(--ink-soft);
+    line-height:1.7;
+  }
+
+  /* restaurant map page */
+  .area-block{margin:0 18px 22px;}
+  .area-title{
+    font-family:'Noto Serif TC',serif;
+    font-weight:700;
+    font-size:16px;
+    margin:0 0 10px;
+    display:flex;align-items:baseline;gap:8px;
+    color:var(--ink);
+  }
+  .area-title .count{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:400;
+  }
+  .r-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  .r-info{flex:1;min-width:0;}
+  .r-name{font-weight:700;font-size:14px;margin:0 0 3px;color:var(--ink);}
+  .r-dish{font-size:12px;color:var(--ink-soft);}
+  .r-link{
+    flex:0 0 auto;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    padding:7px 11px;
+    border-radius:100px;
+    border:1px solid var(--accent);
+    color:var(--accent);
+    text-decoration:none;
+    white-space:nowrap;
+    transition:all .15s ease;
+  }
+  .r-link:hover{background:var(--accent);color:#fff;}
+
+  @media (max-width:400px){
+    header.topbar h1{font-size:22px;}
+    .hero h2{font-size:20px;}
+    .r-card{flex-wrap:wrap;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <span class="eyebrow">SEOUL · 서울 TRIP PLAN</span>
+    <h1>首爾夏日行程</h1>
+    <span class="dates">2026.07.20 MON — 07.23 THU</span>
+  </header>
+
+  <nav class="day-tabs" id="dayTabs">
+    <button class="day-tab active" data-day="1" style="--accent:#2A6F77">
+      <span class="dot"></span><span class="day-label">DAY 1</span><span class="day-date">7/20 一</span>
+    </button>
+    <button class="day-tab" data-day="2" style="--accent:#C4622D">
+      <span class="dot"></span><span class="day-label">DAY 2</span><span class="day-date">7/21 二</span>
+    </button>
+    <button class="day-tab" data-day="3" style="--accent:#8B3A62">
+      <span class="dot"></span><span class="day-label">DAY 3</span><span class="day-date">7/22 三</span>
+    </button>
+    <button class="day-tab" data-day="4" style="--accent:#A6822E">
+      <span class="dot"></span><span class="day-label">DAY 4</span><span class="day-date">7/23 四</span>
+    </button>
+    <button class="day-tab" data-day="5" style="--accent:#B23A48">
+      <span class="dot"></span><span class="day-label">🍽 餐廳</span><span class="day-date">依區域</span>
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- DAY 1 -->
+    <section class="day-panel active" data-panel="1">
+      <div class="hero" style="--accent:#2A6F77">
+        <span class="stub">DAY 1 / 7.20 MON</span>
+        <h2>弘大採買．望遠漢江夜色</h2>
+        <div class="route">
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/홈플러스 합정점" target="_blank" rel="noopener">合井<br>Homeplus</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/홍대입구역" target="_blank" rel="noopener">弘大<br>逛街晚餐</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/망원한강공원" target="_blank" rel="noopener">望遠<br>漢江公園</a></span></div>
+        </div>
+      </div>
+
+      <div class="stats-row" style="--accent:#2A6F77">
+        <div class="stat"><span class="num">3</span><span class="label">景點</span></div>
+        <div class="stat"><span class="num">5</span><span class="label">美食選項</span></div>
+        <div class="stat"><span class="num">2</span><span class="label">移動</span></div>
+      </div>
+
+      <div class="tip-box" style="--accent:#2A6F77">
+        <span class="tip-title">今日提醒</span>
+        <p>合井站 Homeplus 直通地鐵最方便補給。體力允許的話晚上推薦去<b>望遠漢江公園</b>——比熱門的汝矣島更少觀光客，買炸雞吹河風，看楊花大橋夜景很愜意。</p>
+      </div>
+
+      <div class="timeline" style="--accent:#2A6F77">
+        <div class="t-item">
+          <div class="t-icon">🛒</div>
+          <div class="t-body">
+            <span class="t-time">合井站</span>
+            <p class="t-title">Homeplus 補給採買 <a class="pin" href="https://map.naver.com/p/search/홈플러스 합정점" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">連通地鐵站，空間大好逛，適合抵達當天先補齊零食飲水。</p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🍖</div>
+          <div class="t-body">
+            <span class="t-time">傍晚</span>
+            <p class="t-title">弘大逛街．晚餐選一家</p>
+            <p class="t-note">周邊人氣選項，依當下排隊狀況彈性挑選：</p>
+            <div class="chips">
+              <a class="chip" href="https://map.naver.com/p/search/봉산정육식당" target="_blank" rel="noopener">韓牛 鳳山精肉</a>
+              <a class="chip" href="https://map.naver.com/p/search/홍대 24시 감자탕" target="_blank" rel="noopener">24小時豬肉湯飯</a>
+              <a class="chip" href="https://map.naver.com/p/search/이태조감자탕" target="_blank" rel="noopener">李太祖馬鈴薯排骨湯</a>
+              <a class="chip" href="https://map.naver.com/p/search/보승회관" target="_blank" rel="noopener">保承會館 豬肉湯</a>
+              <a class="chip" href="https://map.naver.com/p/search/엽기떡볶이 홍대" target="_blank" rel="noopener">獵奇炒年糕</a>
+            </div>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🌉</div>
+          <div class="t-body">
+            <span class="t-time">夜晚</span>
+            <p class="t-title">望遠漢江公園．楊花大橋夜景 <a class="pin" href="https://map.naver.com/p/search/망원한강공원" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">從弘大／合井出發最近，買份炸雞坐河畔，人潮比汝矣島少很多。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAY 2 -->
+    <section class="day-panel" data-panel="2">
+      <div class="hero" style="--accent:#C4622D">
+        <span class="stub">DAY 2 / 7.21 TUE · ⚠️ 排隊關鍵日</span>
+        <h2>傳統與現代交織．韓屋 × 貝果 × 夜景塔</h2>
+        <div class="route">
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/런던베이글뮤지엄 안국" target="_blank" rel="noopener">安國<br>倫敦貝果</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/광장시장" target="_blank" rel="noopener">廣藏<br>市場</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/북촌한옥마을" target="_blank" rel="noopener">北村<br>韓屋村</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/광화문" target="_blank" rel="noopener">光化門</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/명동" target="_blank" rel="noopener">明洞</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/남산케이블카" target="_blank" rel="noopener">南山<br>首爾塔</a></span></div>
+        </div>
+      </div>
+
+      <div class="stats-row" style="--accent:#C4622D">
+        <div class="stat"><span class="num">7</span><span class="label">景點</span></div>
+        <div class="stat"><span class="num">8</span><span class="label">美食選項</span></div>
+        <div class="stat"><span class="num">6</span><span class="label">移動</span></div>
+      </div>
+
+      <div class="tip-box" style="--accent:#C4622D">
+        <span class="tip-title">⚠️ 倫敦貝果（安國店）重要提醒</span>
+        <p>目前的排隊大魔王，下午去熱門口味通常已售罄、甚至截止排隊。<b>建議早上 8:00 現場按機台候位</b>（或用 Catch Table 國際版 App 線上開排），接著去廣藏市場吃早餐，逛完北村韓屋村剛好回來取貝果，下午再去光化門吃人參雞。</p>
+      </div>
+
+      <div class="timeline" style="--accent:#C4622D">
+        <div class="t-item">
+          <div class="t-icon">⏰</div>
+          <div class="t-body">
+            <span class="t-time">08:00</span>
+            <p class="t-title">安國 倫敦貝果 現場候位 <a class="pin" href="https://map.naver.com/p/search/런던베이글뮤지엄 안국" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">先到現場按機台候位，或用 <b>Catch Table 國際版</b> App 線上開排。</p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🥟</div>
+          <div class="t-body">
+            <span class="t-time">早餐</span>
+            <p class="t-title">廣藏市場 <a class="pin" href="https://map.naver.com/p/search/광장시장" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">吃早餐、逛傳統市集，等候貝果排隊期間的最佳安排。</p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🏯</div>
+          <div class="t-body">
+            <span class="t-time">上午</span>
+            <p class="t-title">北村韓屋村 散步 <a class="pin" href="https://map.naver.com/p/search/북촌한옥마을" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">順路可吃：</p>
+            <div class="chips"><a class="chip" href="https://naver.me/FjbnoWMO" target="_blank" rel="noopener">大瓦屋 醬蟹</a></div>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🥯</div>
+          <div class="t-body">
+            <span class="t-time">中午前</span>
+            <p class="t-title">回倫敦貝果取貨</p>
+            <p class="t-note">時間差不多逛完韓屋村，正好回來取排隊排到的貝果。</p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🍲</div>
+          <div class="t-body">
+            <span class="t-time">午餐</span>
+            <p class="t-title">光化門 人參雞 <a class="pin" href="https://map.naver.com/p/search/광화문" target="_blank" rel="noopener">📍地圖</a></p>
+            <div class="chips">
+              <a class="chip" href="https://map.naver.com/p/search/토속촌삼계탕" target="_blank" rel="noopener">土俗村參雞湯</a>
+              <a class="chip" href="https://map.naver.com/p/search/이문설농탕" target="_blank" rel="noopener">里門雪濃湯</a>
+            </div>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🛍️</div>
+          <div class="t-body">
+            <span class="t-time">傍晚</span>
+            <p class="t-title">明洞逛街．晚餐選一家 <a class="pin" href="https://map.naver.com/p/search/명동" target="_blank" rel="noopener">📍地圖</a></p>
+            <div class="chips">
+              <a class="chip" href="https://map.naver.com/p/search/명동 닭한마리" target="_blank" rel="noopener">明洞一隻雞</a>
+              <a class="chip" href="https://map.naver.com/p/search/명동 설렁탕" target="_blank" rel="noopener">雪濃湯</a>
+              <a class="chip" href="https://map.naver.com/p/search/왕비집 명동본점" target="_blank" rel="noopener">王妃家明洞總店</a>
+              <a class="chip" href="https://map.naver.com/p/search/명동교자" target="_blank" rel="noopener">王記餃子</a>
+              <a class="chip" href="https://map.naver.com/p/search/홍콩반점0410 명동점" target="_blank" rel="noopener">香港飯店0410</a>
+            </div>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🌃</div>
+          <div class="t-body">
+            <span class="t-time">夜晚</span>
+            <p class="t-title">南山電梯＋纜車．首爾塔夜景 <a class="pin" href="https://map.naver.com/p/search/남산케이블카" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">與明洞很順路，逛完街直接搭電梯上去坐纜車。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAY 3 -->
+    <section class="day-panel" data-panel="3">
+      <div class="hero" style="--accent:#8B3A62">
+        <span class="stub">DAY 3 / 7.22 WED</span>
+        <h2>潮流聖水洞與江南</h2>
+        <div class="route">
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/서울숲" target="_blank" rel="noopener">首爾林</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/성수동" target="_blank" rel="noopener">聖水洞</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/강남역" target="_blank" rel="noopener">江南</a></span></div>
+        </div>
+      </div>
+
+      <div class="stats-row" style="--accent:#8B3A62">
+        <div class="stat"><span class="num">5</span><span class="label">景點</span></div>
+        <div class="stat"><span class="num">6</span><span class="label">美食選項</span></div>
+        <div class="stat"><span class="num">4</span><span class="label">移動</span></div>
+      </div>
+
+      <div class="tip-box" style="--accent:#8B3A62">
+        <span class="tip-title">今日提醒</span>
+        <p>首爾林與聖水洞相鄰，動線完美一路逛下去。聖水洞是目前首爾最紅的潮流集散地，建議多留時間給選品店與咖啡廳。晚餐過橋到江南，<b>麵首爾（면서울）</b>的拌蕎麥麵很特別，建議先確認營業時間或先訂位，避免撲空。</p>
+      </div>
+
+      <div class="timeline" style="--accent:#8B3A62">
+        <div class="t-item">
+          <div class="t-icon">🌳</div>
+          <div class="t-body">
+            <span class="t-time">上午</span>
+            <p class="t-title">首爾林 散步 <a class="pin" href="https://map.naver.com/p/search/서울숲" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">與聖水洞相鄰，動線完美接續下一站。</p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">☕</div>
+          <div class="t-body">
+            <span class="t-time">午餐</span>
+            <p class="t-title">聖水洞 選品店＋咖啡廳 <a class="pin" href="https://map.naver.com/p/search/성수동" target="_blank" rel="noopener">📍地圖</a></p>
+            <div class="chips">
+              <a class="chip" href="https://naver.me/5iTdPV9Z" target="_blank" rel="noopener">水芹菜湯飯／生牛肉拌飯</a>
+              <a class="chip" href="https://map.naver.com/p/search/성수동 삼대째 감자탕" target="_blank" rel="noopener">祖傳三代馬鈴薯排骨湯</a>
+            </div>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🥩</div>
+          <div class="t-body">
+            <span class="t-time">彈性</span>
+            <p class="t-title">聖水洞 續攤烤肉（視時間安排）</p>
+            <div class="chips">
+              <a class="chip" href="https://map.naver.com/p/search/성수동 외갓집 고기" target="_blank" rel="noopener">外婆家</a>
+              <a class="chip" href="https://map.naver.com/p/search/서울 성동구 성수일로20길 10" target="_blank" rel="noopener">烤黨 Ggupdang（聖水店）</a>
+            </div>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🚕</div>
+          <div class="t-body">
+            <span class="t-time">傍晚</span>
+            <p class="t-title">移動至江南 <a class="pin" href="https://map.naver.com/p/search/강남역" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">搭地鐵或計程車過橋即達。</p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🍜</div>
+          <div class="t-body">
+            <span class="t-time">晚餐</span>
+            <p class="t-title">麵首爾（면서울）拌蕎麥麵 <a class="pin" href="https://map.naver.com/p/search/면서울" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">精緻現代韓式麵食，建議先訂位／確認營業時間。</p>
+            <div class="chips"><a class="chip alt" href="https://map.naver.com/p/search/강남면옥" target="_blank" rel="noopener">備案：江南麵館</a></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAY 4 -->
+    <section class="day-panel" data-panel="4">
+      <div class="hero" style="--accent:#A6822E">
+        <span class="stub">DAY 4 / 7.23 THU</span>
+        <h2>文青購物與現代百貨</h2>
+        <div class="route">
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/연남동" target="_blank" rel="noopener">延南洞</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/합정역" target="_blank" rel="noopener">合井</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/홍대입구역" target="_blank" rel="noopener">弘大</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/더현대 서울" target="_blank" rel="noopener">汝矣島<br>The Hyundai</a></span></div>
+          <div class="stop"><span class="node"></span><span class="stop-name"><a href="https://map.naver.com/p/search/여의도한강공원" target="_blank" rel="noopener">漢江公園</a></span></div>
+        </div>
+      </div>
+
+      <div class="stats-row" style="--accent:#A6822E">
+        <div class="stat"><span class="num">5</span><span class="label">景點</span></div>
+        <div class="stat"><span class="num">2</span><span class="label">美食選項</span></div>
+        <div class="stat"><span class="num">4</span><span class="label">移動</span></div>
+      </div>
+
+      <div class="tip-box" style="--accent:#A6822E">
+        <span class="tip-title">今日提醒</span>
+        <p>弘大、延南洞、合井連成一氣：延南洞適合下午走文青咖啡廳，合井有很多具設計感的獨立小店。若要去汝矣島逛 <b>The Hyundai Seoul</b>，注意營業時間通常只到 20:00（五六日到 20:30），建議下午 4–5 點就從弘大移動過去，逛完百貨晚上再到漢江公園散步。</p>
+      </div>
+
+      <div class="timeline" style="--accent:#A6822E">
+        <div class="t-item">
+          <div class="t-icon">☕</div>
+          <div class="t-body">
+            <span class="t-time">上午</span>
+            <p class="t-title">延南洞 文青咖啡廳散策 <a class="pin" href="https://map.naver.com/p/search/연남동" target="_blank" rel="noopener">📍地圖</a></p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🛍️</div>
+          <div class="t-body">
+            <span class="t-time">午後</span>
+            <p class="t-title">合井 逛獨立設計小店 <a class="pin" href="https://map.naver.com/p/search/합정역" target="_blank" rel="noopener">📍地圖</a></p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🍲</div>
+          <div class="t-body">
+            <span class="t-time">用餐</span>
+            <p class="t-title">新村一帶 選一家</p>
+            <div class="chips">
+              <a class="chip" href="https://map.naver.com/p/search/신촌 순두부찌개" target="_blank" rel="noopener">新村豆腐鍋</a>
+              <a class="chip" href="https://map.naver.com/p/search/서울 서대문구 연세로5가길 19" target="_blank" rel="noopener">소신이쏘 奶油辣燉排骨</a>
+            </div>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🏬</div>
+          <div class="t-body">
+            <span class="t-time">16:00–17:00</span>
+            <p class="t-title">移動至汝矣島 The Hyundai Seoul <a class="pin" href="https://map.naver.com/p/search/더현대 서울" target="_blank" rel="noopener">📍地圖</a></p>
+            <p class="t-note">⚠️ 營業至 20:00（五六日至 20:30），記得抓時間過去。</p>
+          </div>
+        </div>
+        <div class="t-item">
+          <div class="t-icon">🌆</div>
+          <div class="t-body">
+            <span class="t-time">夜晚</span>
+            <p class="t-title">汝矣島漢江公園 散步收尾 <a class="pin" href="https://map.naver.com/p/search/여의도한강공원" target="_blank" rel="noopener">📍地圖</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAY 5 - 餐廳地圖 -->
+    <section class="day-panel" data-panel="5">
+      <div class="hero" style="--accent:#B23A48">
+        <span class="stub">🍽 餐廳地圖 / 全行程總覽</span>
+        <h2>美食地圖．依區域整理</h2>
+        <p class="hero-sub">7 個區域 · 18 間店，點餐廳名稱旁的按鈕可直接開 Naver Map 定位。</p>
+      </div>
+
+      <div class="tip-box" style="--accent:#B23A48">
+        <span class="tip-title">使用提醒</span>
+        <p>地圖連結是以店名在 Naver Map 搜尋，部分分店名稱為最接近的搜尋結果，出發前建議再次確認是不是正確分店與營業時間。</p>
+      </div>
+
+      <div class="area-block">
+        <p class="area-title">弘大 <span class="count">HONGDAE · 5</span></p>
+        <div class="r-card"><div class="r-info"><p class="r-name">韓牛 鳳山精肉</p><p class="r-dish">招牌：韓牛</p></div><a class="r-link" href="https://map.naver.com/p/search/봉산정육식당" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">24小時豬肉湯飯</p><p class="r-dish">招牌：豬肉湯飯</p></div><a class="r-link" href="https://map.naver.com/p/search/홍대 24시 감자탕" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">李太祖馬鈴薯排骨湯</p><p class="r-dish">招牌：馬鈴薯排骨湯</p></div><a class="r-link" href="https://map.naver.com/p/search/이태조감자탕" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">保承會館</p><p class="r-dish">招牌：豬肉湯</p></div><a class="r-link" href="https://map.naver.com/p/search/보승회관" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">獵奇炒年糕</p><p class="r-dish">招牌：炒年糕</p></div><a class="r-link" href="https://map.naver.com/p/search/엽기떡볶이 홍대" target="_blank" rel="noopener">📍 開地圖</a></div>
+      </div>
+
+      <div class="area-block">
+        <p class="area-title">明洞 <span class="count">MYEONGDONG · 5</span></p>
+        <div class="r-card"><div class="r-info"><p class="r-name">明洞一隻雞</p><p class="r-dish">招牌：一隻雞</p></div><a class="r-link" href="https://map.naver.com/p/search/명동 닭한마리" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">雪濃湯</p><p class="r-dish">招牌：雪濃湯</p></div><a class="r-link" href="https://map.naver.com/p/search/명동 설렁탕" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">王妃家明洞總店</p><p class="r-dish">招牌：烤肉</p></div><a class="r-link" href="https://map.naver.com/p/search/왕비집 명동본점" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">王記餃子</p><p class="r-dish">招牌：餃子、刀削麵</p></div><a class="r-link" href="https://map.naver.com/p/search/명동교자" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">香港飯店0410</p><p class="r-dish">招牌：糖醋肉、炒碼麵、麻醬麵</p></div><a class="r-link" href="https://map.naver.com/p/search/홍콩반점0410 명동점" target="_blank" rel="noopener">📍 開地圖</a></div>
+      </div>
+
+      <div class="area-block">
+        <p class="area-title">聖水 <span class="count">SEONGSU · 4</span></p>
+        <div class="r-card"><div class="r-info"><p class="r-name">水芹菜湯飯／生牛肉拌飯</p><p class="r-dish">招牌：湯飯、生牛肉拌飯</p></div><a class="r-link" href="https://naver.me/5iTdPV9Z" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">祖傳三代馬鈴薯排骨湯</p><p class="r-dish">招牌：馬鈴薯排骨湯</p></div><a class="r-link" href="https://map.naver.com/p/search/성수동 삼대째 감자탕" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">外婆家</p><p class="r-dish">招牌：烤肉</p></div><a class="r-link" href="https://map.naver.com/p/search/성수동 외갓집 고기" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">烤黨 Ggupdang（聖水店）</p><p class="r-dish">招牌：厚切熟成梅花肉、豬頰肉（桌邊代烤）、松露炸醬麵 · 聖水站3號出口步行3分</p></div><a class="r-link" href="https://map.naver.com/p/search/서울 성동구 성수일로20길 10" target="_blank" rel="noopener">📍 開地圖</a></div>
+      </div>
+
+      <div class="area-block">
+        <p class="area-title">光化門 <span class="count">GWANGHWAMUN · 2</span></p>
+        <div class="r-card"><div class="r-info"><p class="r-name">土俗村參雞湯</p><p class="r-dish">招牌：參雞湯</p></div><a class="r-link" href="https://map.naver.com/p/search/토속촌삼계탕" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">里門雪濃湯</p><p class="r-dish">招牌：雪濃湯</p></div><a class="r-link" href="https://map.naver.com/p/search/이문설농탕" target="_blank" rel="noopener">📍 開地圖</a></div>
+      </div>
+
+      <div class="area-block">
+        <p class="area-title">北村 <span class="count">BUKCHON · 1</span></p>
+        <div class="r-card"><div class="r-info"><p class="r-name">大瓦屋</p><p class="r-dish">招牌：醬蟹</p></div><a class="r-link" href="https://naver.me/FjbnoWMO" target="_blank" rel="noopener">📍 開地圖</a></div>
+      </div>
+
+      <div class="area-block">
+        <p class="area-title">江南 <span class="count">GANGNAM · 2</span></p>
+        <div class="r-card"><div class="r-info"><p class="r-name">麵首爾（면서울）</p><p class="r-dish">招牌：拌蕎麥麵</p></div><a class="r-link" href="https://map.naver.com/p/search/면서울" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">江南麵館</p><p class="r-dish">招牌：麵食（備案）</p></div><a class="r-link" href="https://map.naver.com/p/search/강남면옥" target="_blank" rel="noopener">📍 開地圖</a></div>
+      </div>
+
+      <div class="area-block">
+        <p class="area-title">新村 <span class="count">SINCHON · 2</span></p>
+        <div class="r-card"><div class="r-info"><p class="r-name">新村豆腐鍋</p><p class="r-dish">招牌：豆腐鍋</p></div><a class="r-link" href="https://map.naver.com/p/search/신촌 순두부찌개" target="_blank" rel="noopener">📍 開地圖</a></div>
+        <div class="r-card"><div class="r-info"><p class="r-name">소신이쏘 Sosin Isso</p><p class="r-dish">招牌：奶油辣燉排骨 · 서울 서대문구 연세로5가길 19 1층</p></div><a class="r-link" href="https://map.naver.com/p/search/서울 서대문구 연세로5가길 19" target="_blank" rel="noopener">📍 開地圖</a></div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.day-tab');
+  const panels = document.querySelectorAll('.day-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const day = tab.dataset.day;
+      tabs.forEach(t => t.classList.toggle('active', t === tab));
+      panels.forEach(p => p.classList.toggle('active', p.dataset.panel === day));
+      tab.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+    });
+  });
+</script>
+</body>
+</html>
